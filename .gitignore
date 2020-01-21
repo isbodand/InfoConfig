@@ -4,6 +4,9 @@
 ### Build dirs
 *build*/
 
+### Dependencies
+libs/xerces
+
 # Created by .ignore support plugin (hsz.mobi)
 ### C++ template
 # Prerequisites
