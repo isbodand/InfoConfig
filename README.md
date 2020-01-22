@@ -1,7 +1,5 @@
 # InfoConfig
 XML-based configuration library used by InfoSoft executables
-<<<<<<< HEAD
-=======
 
 ## Licenses
 
@@ -13,4 +11,3 @@ For more information see the provided `LICENSE.apache2` file, and the project's 
 for even more. 
 
 [x]: https://xerces.apache.org/xerces-c/
->>>>>>> 4ada5d6... Licensing and readme
