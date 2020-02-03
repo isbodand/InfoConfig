@@ -1,0 +1,136 @@
+config ::= (declaration | function call)+;
+
+declaration ::= namespace declaration
+              | function declaration
+              | value declaration
+              ;
+
+namespace declaration ::= 'namespace', identifier;
+
+// function declaration ::= ; todo
+
+value declaration ::= type identifier, identifier, initializer;
+
+type identifier ::= 'string'
+                  | primitive types
+                  | 'Integer' | 'Float'
+                  | list type
+                  | identifier
+                  ;
+
+type sign ::= 'signed'
+            | 'unsigned'
+            ;
+
+primitive types ::= 'void'
+                  | type sign, primitive type identifier
+                  | 'float'
+                  | 'double'
+                  ;
+
+primitive integer identifier ::= 'char'
+                               | 'short', 'int'?
+                               | 'int'
+                               | 'long', 'int'?
+                               ;
+
+initializer ::= standard initializer
+              | assignment initialization
+              ;
+
+assignment initialization ::= '=' assignment initializer;
+
+assignment initializer ::= mixed initializer
+                         | named initializer
+                         | tuple initializer
+                         | list initializer
+                         | value
+                         ;
+
+mixed initializer ::= '{', (argument | named argument), (';', argument | named argument)*, '}';
+
+tuple initializer ::= '{', argument?, (';', argument)* '}';
+
+list initializer ::= list type, '{', arguments?, '}';
+
+list type ::= 'list', template instantiation
+            | 'list'
+            ;
+
+template instantiation ::= '<', (type identifier)+, '>';
+
+named initializer ::= '{', named arguments?,'}';
+
+named arguments ::= named argument, (';', named argument)*;
+
+named argument ::= raw identifier, '=', argument;
+
+standard initializer ::= '{', arguments?, '}';
+
+function call ::= identifier, arguments?;
+
+identifier ::= qualified identifier
+             | raw identifier
+             ;
+
+qualified identifier ::= namespace qualifier, identifier;
+
+namespace qualifier ::= raw identifier, ':';
+
+raw identifier ::= /[A-Za-z_][A-Za-z0-9_]/;
+
+arguments ::= argument, (',', argument)*;
+
+argument ::= identifier
+           | expression
+           ;
+
+expression ::= equality expression;
+
+equality expression ::= ordering expression, (('==' | '!='), ordering expression)*;
+
+ordering expression ::= additive expression, (('>=' | '>' | '<=' | '<'), additive-expression)*
+
+additive expression ::= multiplicative expression, (( '+' | '-' ), multiplicative expression)*;
+
+multiplicative expression ::= primary expression, (('*' | '/' | '%'), primary expression)*;
+
+primary expression ::= '(' expression ')'
+                     | literal
+                     | identifier
+                     | '-' primary expression
+                     ;
+
+value ::= literal
+        | identifier
+        ;
+
+literal ::= string literal
+          | numeric literal
+          | boolean literal
+          ;
+
+string literal ::= static string literal
+                 | interpolated string literal
+                 ;
+
+static string literal ::= /'(?:(?![\\']).)*(?:\\.(?:(?![\\']).)*)*'/;
+
+interpolated string literal ::= /"(?:(?![\\"]).)*(?:\\.(?:(?![\\"]).)*)*"/;
+
+numeric literal ::= integer literal
+                  | float literal
+                  ;
+
+numeric sign ::= ('+' | '-');
+
+integer literal ::= decimal integer literal
+                  | octal integer literal
+                  | hexadecimal integer literal
+                  ;
+
+decimal integer literal ::= numeric sign?, /[1-9]/, /[0-9]/*;
+octal integer literal ::= numeric sign?, '0', /[1-7]/, /[0-7]/*;
+hexadecimal integer literal ::= numeric sign?, '0x', /[1-9A-Fa-f]/, /0-9A-Fa-f/*;
+
+float literal ::= numeric sign?, /(?:\+|-)?(?(?=\.$)(*FAIL))\d*\.\d*/;

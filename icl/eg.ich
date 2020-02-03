@@ -1,0 +1,56 @@
+ics:version =  '1.0.0'; # String
+ics:encoding = ics:Encoding:UTF8; # ics:Encoding
+
+ics:schema = {
+    id = 'TestSchema';
+    version = '1.0.0';
+    codename = 'Jäger';
+}; # ics:SchemaDesignator
+
+sys:use ics:TypeType;
+sys:use ics:BuiltinType;
+
+ics:types = {
+    {Struct, 'S', {
+        {String, 'foo'},
+        {Float, 'bar'}
+    }},
+    {Struct, 'S2', {
+        {String, 'givenName'},
+        {String, 'middleName'},
+        {String, 'familyName'}
+    }},
+    {Enum, 'E', {
+        'Enumerator1',
+        'Enumerator2'
+    }}
+}; # list<ics:TypeDesignator>
+
+sys:use ics:requirement as req;
+sys:use ics:attribute as attr;
+
+ics:values = {
+    {'A', {
+        {'some', Any},
+        {'s', 'S'},
+        {'memberInit', 'S'},
+        {'typeInit', 'S'},
+        {'listInit', 'S2'},
+        {'e', 'E', 'E:Enumerator1'},
+        {'key', String, reqs = {
+            req:Glob{'*[Pp]*'}, # I know these are useless with the limit; example's sake
+            req:Regex{q/^\S+$/},
+            req:LimitTo{{
+                'Apple',
+                'Pear',
+                'Plum'
+            }}
+        }},
+        {'masterk', String, 'key', attrs = {
+            attr:Lazy
+        }},
+        {'fun', String, attrs = {
+            attr:Uncached
+        }}
+    }}
+}; # list<ics:NamespaceDesignator>

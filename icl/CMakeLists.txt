@@ -32,23 +32,34 @@
 # ********************************************************************************
 
 cmake_minimum_required(VERSION 3.16)
-## Include modules
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-include(InfoCUtils)
 
-## Options
-option(INFO_CONFIG_BUILD_SHARED "Build the InfoConfig library as a shared object/dll" On)
-#option(INFO_CONFIG_BUILD_EXAMPLE "Build the InfoConfig example usage project" Off) todo
+if (INFO_PROJECT_NAME)
+    set(_INFO_PROJECT_NAME ${INFO_PROJECT_NAME})
+    set(INFO_FIX_PROJECT_NAME Yes)
+endif ()
+set(INFO_PROJECT_NAME ConfigLanguage)
+## BEGIN Project
 
-NameOption(${INFO_CONFIG_BUILD_SHARED} "SHARED;STATIC" ssInfoConfigBuildType)
+## CMake Project init
+project(Info${INFO_PROJECT_NAME} CXX)
 
-project(InfoConfig CXX)
+## Project level macros
+set(${INFO_PROJECT_NAME}_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
 
-set(INFO_PROJECT_NAME Config)
+## Initialize target
+add_library(icl INTERFACE)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_SKIP_RPATH FALSE)
-set(CMAKE_BUILD_RPATH "$ORIGIN:/lib:/lib64:/usr/lib:/usr/lib64:${CMAKE_BINARY_DIR}:${CMAKE_BUILD_RPATH}")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")
+## Get dependencies
+find_package(Boost REQUIRED)
 
-add_subdirectory(icl)
+## Set target properties
+target_include_directories(icl
+                           INTERFACE
+                           ${${INFO_PROJECT_NAME}_INCLUDE_DIR}
+                           ${Boost_INCLUDE_DIRS}
+                           )
+
+## END Project
+if (INFO_FIX_PROJECT_NAME)
+    set(INFO_PROJECT_NAME ${_INFO_PROJECT_NAME})
+endif ()

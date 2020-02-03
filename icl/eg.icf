@@ -1,0 +1,66 @@
+sys:conforms "TestSchema";
+# ^ Tells the parsing code to expect types and a structure that fits the requirements of "TestSchema".
+# A generated InfoConfig handler can handle multiple schemata if they are present during the generation step.
+
+# A ConfigSchema is required to parse the configuration, which is used to generate the required types during an
+# extra compilation step
+# The advised way is to let icsc compile the *.ich file into a meaningful list of types and
+# the validator functors from an InfoConfigLanguage compatible InfoConfigHeader file containing an InfoConfigSchema.
+# The other way is to manually register the types and validator functors, this is the way icsc is built because I do not
+# want to bother with some bootstrapping procedure which can make it work with ich files that build themselves
+
+namespace A {
+    auto some = 20000; # A:some
+
+    S s{"yes", 42}; # standard-initialization
+
+    S memberInit = {
+        foo = "fling"; # A:memberInit.foo
+        bar = 54.74;
+    }; # named-initialization from anonymous struct type
+
+    S typeInit = {
+        "the member names are",
+        0xDEAD
+    }; # tuple-initialization from anonymous struct type
+    # Note: lists are only deduced for {A, B, C} if type(A) == type(B) == type(C). Numeric values are convertible, though.
+    # if A, B, and C are polymorphically equal (share an ancestor), the list is still not deduced, unless specifically
+    # requested, either by the type of the variable into which the list is assigned, or by explicitly saying you want a
+    # list by using List{A, B, C}. If there exists a monomorphic type in the list (which cannot be contorted into an acceptable type),
+    # or they are not polymorphically equal, an error occurs as of version `1.0.0`.
+
+    S mixInit = {
+        5.6;
+        foo = "mixed is chaotic";
+    }; # mixed-initialization, from an anonymous struct type which/whose:
+    # - contains the same types as the target struct
+    # - any named member has the same type as the same named member in the target struct
+
+    S2 listInit = {
+        'NamePart1',
+        'NamePart2',
+        'NamePart3'
+    }; # List initialization for structs of the same type from a list.
+    # If list has more members the remnants are ignored;
+    # it is padded with the empty string if it has less, including none
+
+    E e = E:Enumerator1;
+
+    # Values which depend on other values are dependant values.
+    # Their values are calculated when they are encountered using the current
+    # value present in the value they depend on. If it does not exist it is 0 in
+    # numeric calculations an the empty string in string manipulations.
+    auto dependant = "${some} men are gone.";
+    auto _3some = 3 * some;
+
+    # Lazy values are evaluated when they are required, but retain their value thenceafter
+    auto [[lazy]] lazy = some;
+
+    # Uncached variables are always recalculated whenever they are used
+    # note: [expr] is used inside the ${} string interpolation to annotate a complex expression
+    auto [[uncached]] fun = "${some} is larger than ${[some - 1]}"
+}
+
+auto A:key = "Apple"; # creating values without explicit namespace declaratio
+auto A:masterk = "property"; # ICS specified attributes are applied even if left out from a config
+# thus ^ = auto [[lazy]] A:masterk = "property";
