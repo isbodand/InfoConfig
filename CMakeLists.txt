@@ -38,13 +38,11 @@ include(InfoCUtils)
 
 ## Options
 option(INFO_CONFIG_BUILD_SHARED "Build the InfoConfig library as a shared object/dll" On)
-option(INFO_CONFIG_BUILD_EXAMPLE "Build the InfoConfig example usage project" Off)
+#option(INFO_CONFIG_BUILD_EXAMPLE "Build the InfoConfig example usage project" Off) todo
+
 NameOption(${INFO_CONFIG_BUILD_SHARED} "SHARED;STATIC" ssInfoConfigBuildType)
 
-project(InfoConfig
-        VERSION 1.0.0
-        LANGUAGES CXX
-        )
+project(InfoConfig CXX)
 
 set(INFO_PROJECT_NAME Config)
 
@@ -53,45 +51,3 @@ set(CMAKE_SKIP_RPATH FALSE)
 set(CMAKE_BUILD_RPATH "$ORIGIN:/lib:/lib64:/usr/lib:/usr/lib64:${CMAKE_BINARY_DIR}:${CMAKE_BUILD_RPATH}")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")
 
-## Create target library
-add_library(xfg ${ssInfoConfigBuildType}
-            src/Config.cpp
-            src/LocalXMLString.cpp
-            src/exception/InfoConfigException.cpp
-            src/exception/InitializationException.cpp
-            src/exception/ParsingException.cpp
-            src/Accessor.cpp
-            )
-if (INFO_CONFIG_BUILD_SHARED)
-    target_compile_options(xfg PUBLIC -DINFO_CONFIG_DLL PRIVATE -DINFO_CONFIG_BUILD_DLL)
-endif ()
-
-## Load dependencies
-find_package(Boost REQUIRED)
-
-add_subdirectory(libs)
-# Xerces-C
-list(APPEND lLibraries xerces-c)
-SilenceWarnings(xerces-c)
-get_property(ssXercesIncludeDir GLOBAL PROPERTY XERCES_INCLUDE)
-get_property(ssXercesVersion GLOBAL PROPERTY XERCES_VERSION)
-set(ssXercesConfigdIncludeDir
-    ${CMAKE_BINARY_DIR}/libs/xerces/xerces-c-${ssXercesVersion}/src
-    )
-
-## Target includes
-target_include_directories(xfg
-                           PUBLIC
-                           "${CMAKE_SOURCE_DIR}/include"
-                           PRIVATE
-                           "${ssXercesIncludeDir}"
-                           "${ssXercesConfigdIncludeDir}"
-                           "${Boost_INCLUDE_DIR}"
-                           )
-
-## Target linkage
-target_link_libraries(xfg xerces-c)
-
-if (INFO_CONFIG_BUILD_EXAMPLE)
-    add_subdirectory(example)
-endif ()
