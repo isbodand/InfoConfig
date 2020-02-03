@@ -32,24 +32,45 @@
 # ********************************************************************************
 
 cmake_minimum_required(VERSION 3.16)
-## Include modules
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
-include(InfoCUtils)
 
-## Options
-option(INFO_CONFIG_BUILD_SHARED "Build the InfoConfig library as a shared object/dll" On)
-#option(INFO_CONFIG_BUILD_EXAMPLE "Build the InfoConfig example usage project" Off) todo
+option(INFO_CONFIG_BUILD_SCHEMA_COMPILER
+       "Builds the icsc executable to compile *.ics files into the appropriate parser for type-safety."
+       On)
 
-NameOption(${INFO_CONFIG_BUILD_SHARED} "SHARED;STATIC" ssInfoConfigBuildType)
+if (INFO_CONFIG_BUILD_SCHEMA_COMPILER)
+    if (INFO_PROJECT_NAME)
+        set(_INFO_PROJECT_NAME ${INFO_PROJECT_NAME})
+        set(INFO_FIX_PROJECT_NAME Yes)
+    endif ()
+    set(INFO_PROJECT_NAME ConfigSchemaBuilder)
+    ## BEGIN Project
 
-project(InfoConfig CXX)
+    project(Info${INFO_PROJECT_NAME} CXX)
 
-set(INFO_PROJECT_NAME Config)
+    # Project level macros
+    set(${INFO_PROJECT_NAME}_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
+    set(${INFO_PROJECT_NAME}_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_SKIP_RPATH FALSE)
-set(CMAKE_BUILD_RPATH "$ORIGIN:/lib:/lib64:/usr/lib:/usr/lib64:${CMAKE_BINARY_DIR}:${CMAKE_BUILD_RPATH}")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")
+    # Initialize target
+    add_executable(icsc
+                   ${${INFO_PROJECT_NAME}_SOURCE_DIR}/main.cpp)
 
-add_subdirectory(icl)
-add_subdirectory(icsc)
+    # Getting dependencies
+    find_package(Boost REQUIRED)
+
+    # Set target properties
+    target_include_directories(icsc
+                               PRIVATE
+                               ${${INFO_PROJECT_NAME}_INCLUDE_DIR}
+                               ${Boost_INCLUDE_DIRS}
+                               )
+
+    target_link_libraries(icsc
+                          PRIVATE icl
+                          )
+
+    ## END Project
+    if (INFO_FIX_PROJECT_NAME)
+        set(INFO_PROJECT_NAME ${_INFO_PROJECT_NAME})
+    endif ()
+endif ()
