@@ -1,0 +1,91 @@
+=pod
+
+=head1 InfoConfig
+
+InfoSoft official configuration language. Over-engineered as all things should be.
+Supports both a type-safe and a not-so-type-safe way of operation.
+The type-safe one requires a new build-step for itself, the not-so-type-safe
+throws everything at you in strings, including numbers.
+
+=head2 Prerequisites
+
+The followings are required to B<build> InfoConfig
+
+=over 2
+
+=item * C++17 Compiler
+
+A working (duh) C++ compiler, up-to-date with the C++17 Standard.
+C<GCC> or C<Clang> are always a good option, if you want to ask my opinion, as
+the code is always made to work with these two.
+If, for some hideous reason, you hap to be stuck with C<MSVC>, may the gods have
+mercy on your forlorn soul, and need to use this library, pray to whomsoever you wish
+that this works.
+I'm not good enough of a programmer to deal with the shit C<MSVC> spouts. Not for
+fun that is, human greed can persuade me to do so, but that is unlikely to happen.
+
+=item * CMake
+
+CMake version 3.16 and up are acceptable. I know 3.16 is the newest release as of now;
+deal with it and use up-to-date software for once.
+
+=item * Boost
+
+Boost headers, that is.
+No built part of boost is required as of now.
+
+=back
+
+=head2 Building
+
+The build steps are easy, for that all hail CMake.
+
+ mkdir build && cd build
+ cmake ..
+ make -j 6
+ sudo make install
+
+There are multiple options which can be passed to CMake.
+
+=over 1
+
+=item C<CMAKE_BUILD_TYPE:I<STRING>>
+
+The type of the libraries to build.
+TL;DR: Use C<Release> if you use the project as a end-user;
+use C<Debug> if you are hacking away on the project itself.
+Default is god knows what.
+For more information see the relevant CMake
+L<documentation|https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html>.
+
+=item C<CMAKE_INSTALL_PREFIX:I<STRING>>
+
+The installation prefix to install the project's files to.
+Default is F</usr/local/> for UNIX and F<C:\Program Files\> on Windows.
+For more information see the relevant CMake
+L<documentation|https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html>
+
+=item C<INFO_CONFIG_BUILD_SHARED:I<BOOL>>
+
+Build the main InfoConfig library as a shared object/dll into
+F<libicfg.so>/F<libicfg.dll>? Default is C<B<ON>>.
+
+=item C<INFO_CONFIG_LANGUAGE_BUILD_SHARED:I<BOOL>>
+
+Build the InfoConfigLanguage parser, ast, and validator runtime as a
+shared object/dll into F<libicl.so>/F<libicl.dll>? Default is C<B<ON>>.
+
+=item C<INFO_CONFIG_BUILD_SCHEMA_COMPILER:I<BOOL>>
+
+Build the B<icsc> executable to allow building InfoConfigSchema files into
+a type-checking parser and a type-safe API for that specific library?
+Default is C<B<ON>>.
+
+=back
+
+=head2 Licenses
+
+InfoConfig is licensed under the C<BSD 3-Clause> license. For more information see
+the provided F<LICENSE> file.
+
+=cut

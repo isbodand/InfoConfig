@@ -38,13 +38,11 @@ include(InfoCUtils)
 
 ## Options
 option(INFO_CONFIG_BUILD_SHARED "Build the InfoConfig library as a shared object/dll" On)
-option(INFO_CONFIG_BUILD_EXAMPLE "Build the InfoConfig example usage project" Off)
+#option(INFO_CONFIG_BUILD_EXAMPLE "Build the InfoConfig example usage project" Off) todo
+
 NameOption(${INFO_CONFIG_BUILD_SHARED} "SHARED;STATIC" ssInfoConfigBuildType)
 
-project(InfoConfig
-        VERSION 1.0.0
-        LANGUAGES CXX
-        )
+project(InfoConfig CXX)
 
 set(INFO_PROJECT_NAME Config)
 
